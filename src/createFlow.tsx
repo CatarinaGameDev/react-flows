@@ -1,15 +1,15 @@
 import React, { ComponentType, ReactNode, useEffect, useState } from 'react';
 
-type FlowComponent<P = any, O = void> = ComponentType<P & { finish(output: O): void }>;
+type FlowComponent<P = any, O = void> = ComponentType<P & ({ finish: (output: O) => void })>;
 
 interface FlowFunctionTools {
-    render<P, O>(component: FlowComponent<P, O>, props?: P): Promise<O>;
+    render<P, O = void>(component: FlowComponent<P, O>, props?: P): Promise<O>;
 }
 
-type FlowFunction = (tools: FlowFunctionTools) => Promise<void>
+type FlowFunction<O> = (tools: FlowFunctionTools) => Promise<O>;
 
-export default function createFlow<P>(flowCreator: (props: P) => FlowFunction) {
-    function FlowComponent(props: P): ReactNode {
+export default function createFlow<P, O = void>(flowCreator: (props: P) => FlowFunction<O>) {
+    function FlowComponent(props: P & { onFinish?: (output: O) => void }) {
         const [renderProps, setRenderProps] = useState({
             component: null as unknown as FlowComponent,
             props: null as unknown,
@@ -19,18 +19,22 @@ export default function createFlow<P>(flowCreator: (props: P) => FlowFunction) {
         // Main runner
         useEffect(() => {
             const tools: FlowFunctionTools = {
-                render<P, O>(component: FlowComponent<P, O>, props?: P) {
+                render<P, O = void>(component: FlowComponent<P, O>, rProps?: P) {
                     return new Promise<O>(resolve => {
                         setRenderProps(prev => ({
                             component,
-                            props: { ...props, finish: resolve },
+                            props: { ...rProps, finish: resolve },
                             key: prev.key + 1
                         }));
                     });
                 }
             };
 
-            flowCreator(props)(tools);
+            (async () => {
+                const output = await flowCreator(props)(tools);
+
+                props.onFinish?.(output);
+            })();
         }, []);
 
         const {
@@ -44,7 +48,7 @@ export default function createFlow<P>(flowCreator: (props: P) => FlowFunction) {
         }
 
         return (
-            <CurrentComponent key={key} {...props} />
+            <CurrentComponent key={key} {...currentProps} />
         );
     }
 

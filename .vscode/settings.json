@@ -10,8 +10,7 @@
         "**/*.meta": true,
         "**/*.sln": true,
         "**/package-lock.json": true,
-        "**/node_modules": true,
-        "**/dist": true
+        "**/node_modules": true
     },
     "explorerExclude.backup": null
 }
