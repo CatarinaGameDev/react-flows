@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import './App.css';
 
 import { createFlow } from 'react-flows';
@@ -14,8 +14,6 @@ const MessagesFlowComponent = createFlow<{ messages: string[] }>(props => async 
 function MessageView(props: { message: string, isLast: boolean, finish: () => void }) {
   const { message, isLast, finish } = props;
 
-  console.log(props)
-
   return (
     <div>
       <p>{message}</p>
@@ -24,17 +22,53 @@ function MessageView(props: { message: string, isLast: boolean, finish: () => vo
   );
 }
 
+const InputFlowComponent = createFlow(() => async ({ render }) => {
+  const input = await render(InputView);
+
+  render(OutputView, { text: input });
+
+  return input;
+});
+
+function InputView(props: { finish: (input: string) => void}) {
+  const { finish } = props;
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onSubmit = useCallback(() => {
+    finish(inputRef.current?.value ?? '');
+  }, [finish]);
+
+  return (
+    <div>
+      <input ref={inputRef} type='text'/>
+      <button onClick={onSubmit}>Submit</button>
+    </div>
+  );
+}
+
+function OutputView(props: { text: string }) {
+  return (
+    <div>
+      You said: {props.text}
+    </div>
+  )
+}
+
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
+      <div>
         <MessagesFlowComponent
-          messages={['Hello!', 'This component shows messages on separate slides, one by one.', 'This is the final slide!']}
+          messages={[
+            'Hello!',
+            'This component shows messages on separate slides, one by one.',
+            'This is the final slide!'
+          ]}
         />
-      </header>
+
+        <InputFlowComponent onFinish={input => console.log('User said', input)} />
+      </div>
     </div>
   );
 }
