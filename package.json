@@ -1,9 +1,13 @@
 {
   "name": "react-flows",
   "version": "0.0.1",
-  "description": "",
+  "description": "Create React app flows through asynchronous functions.",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CatarinaGameDev/react-flows"
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build"
