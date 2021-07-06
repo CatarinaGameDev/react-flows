@@ -1,0 +1,7 @@
+src/
+.gitignore
+tsconfig.json
+jsconfig.json
+coverage/
+.vscode/
+example/
