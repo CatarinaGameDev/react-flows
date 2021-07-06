@@ -41,6 +41,7 @@ function InputView(props: { finish: (input: string) => void}) {
 
   return (
     <div>
+      <div>This component takes your input and shows it on the next slide.</div>
       <input ref={inputRef} type='text'/>
       <button onClick={onSubmit}>Submit</button>
     </div>
@@ -58,16 +59,22 @@ function OutputView(props: { text: string }) {
 function App() {
   return (
     <div className="App">
-      <div>
-        <MessagesFlowComponent
-          messages={[
-            'Hello!',
-            'This component shows messages on separate slides, one by one.',
-            'This is the final slide!'
-          ]}
-        />
+      <h1>React Flows examples</h1>
 
-        <InputFlowComponent onFinish={input => console.log('User said', input)} />
+      <div className="flows-group">
+        <div className="flow">
+          <MessagesFlowComponent
+            messages={[
+              'Hello!',
+              'This component shows messages on separate slides, one by one.',
+              'This is the final slide!'
+            ]}
+          />
+        </div>
+
+        <div className="flow">
+          <InputFlowComponent onFinish={input => console.log('User said', input)} />
+        </div>
       </div>
     </div>
   );
